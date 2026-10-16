@@ -1,0 +1,50 @@
+name: Check and Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code download karo
+        uses: actions/checkout@v4
+
+      - name: Files check karo
+        run: |
+          test -f index.html
+          test -f style.css
+          grep -q "<title>" index.html
+          grep -q "</html>" index.html
+
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_PATH: practice-deploy/
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_Key }}
+    steps:
+      - name: Code download karo
+        uses: actions/checkout@v4
+
+      - name: SSH key set up karo
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+
+      - name: Server pe files bhejo
+        run: |
+          SSH="ssh -i $HOME/.ssh/deploy_key -p $SSH_PORT"
+          $SSH "$SSH_USER@$SSH_HOST" "mkdir -p $DEPLOY_PATH"
+          rsync -rlvz -e "$SSH" \
+            --exclude='.git/' --exclude='.github/' \
+            --exclude='readme.txt' \
+            ./ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
