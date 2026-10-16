@@ -24,11 +24,12 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
-      DEPLOY_PATH: practice-deploy/
+      env:
+      DEPLOY_PATH: public_html/
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT }}
       SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_KEY: ${{ secrets.SSH_PRIVATE_Key }}
+      SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     steps:
       - name: Code download karo
         uses: actions/checkout@v4
