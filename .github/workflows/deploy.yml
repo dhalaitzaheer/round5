@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       env:
-      DEPLOY_PATH: domains/ci4.zaheerdhalait.com/public_html/
+      DEPLOY_PATH: ci4.zaheerdhalait.com
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PORT: ${{ secrets.SSH_PORT }}
       SSH_USER: ${{ secrets.SSH_USER }}
